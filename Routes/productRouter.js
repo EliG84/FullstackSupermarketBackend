@@ -1,5 +1,5 @@
 const express = require('express');
-const Product = require('../Models/Product');
+const { Product } = require('../Models/Product');
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -28,7 +28,9 @@ router.post('/addProduct', (req, res) => {
     info: req.body.info,
     image: req.body.image,
   });
-  newProduct.save();
+  newProduct.save().then((data) => {
+    res.json(data);
+  });
 });
 
 module.exports = router;
