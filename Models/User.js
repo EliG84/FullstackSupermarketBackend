@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const Product = require('./Product');
+const { Product, ProductSchema } = require('./Product');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -8,7 +8,7 @@ const UserSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   answer: { type: String, required: true },
-  cart: [Product],
+  cart: [ProductSchema],
   profile: { type: Object, default: {} },
 });
 

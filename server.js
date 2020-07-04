@@ -12,8 +12,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 const productRouter = require('./Routes/productRouter');
+const userRouter = require('./Routes/userRouter');
 
 app.use('/api', productRouter);
+app.use('/user', userRouter);
 
 app.listen(port, () => {
   console.log(`listening on port ${port}`);

@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 const Joi = require('@hapi/joi');
 const config = require('config');
 const User = require('../Models/User');
@@ -12,21 +13,21 @@ const schema = Joi.object({
   answer: Joi.string().max(50).required(),
 });
 
-export const authEmail = (req, res, next) => {
+const authEmail = (req, res, next) => {
   User.findOne({ email: req.data.email }).then((data) => {
     if (data) return res.json({ logged: false, body: 'User already exists' });
     next();
   });
 };
 
-export const authSignUp = (req, res, next) => {
+const authSignUp = (req, res, next) => {
   const { error, value } = schema.validate(req.body).then(value);
   if (error)
     return res.json({ logged: false, body: error.ValidationError.message });
   next();
 };
 
-export const authToken = (req, res, next) => {
+const authToken = (req, res, next) => {
   const token = req.header('x-auth-token');
   if (!token) return res.json({ logged: false, body: 'Token not present' });
   const decoded = jwt.verify(token, config.get('key'));
@@ -35,7 +36,7 @@ export const authToken = (req, res, next) => {
   next();
 };
 
-export const authLogin = (req, res, next) => {
+const authLogin = (req, res, next) => {
   User.findOne({ email: req.body.email }).then((data) => {
     if (!data)
       return res.json({ logged: false, body: 'Invalid login details' });
@@ -49,8 +50,25 @@ export const authLogin = (req, res, next) => {
         { id: data._id, email: data.email },
         config.get('key')
       );
+      req.body.user = data;
       req.body.token = token;
       next();
     });
   });
 };
+
+const generateToken = (id, email) => {
+  const token = jwt.sign({ id, email }, config.get('key'));
+  return token;
+};
+
+const pickUserProps = (user) => {
+  return _.pick(user, ['email', '_id', 'cart', 'image', 'profile']);
+};
+
+exports.authEmail = authEmail;
+exports.authSignUp = authSignUp;
+exports.authToken = authToken;
+exports.authLogin = authLogin;
+exports.generateToken = generateToken;
+exports.pickUserProps = pickUserProps;
