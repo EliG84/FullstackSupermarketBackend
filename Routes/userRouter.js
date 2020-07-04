@@ -28,7 +28,7 @@ router.post('/login', authLogin, (req, res) => {
 router.post('/signup', authEmail, authSignUp, (req, res) => {
   User.create(req.body).then((data) => {
     const token = generateToken(data._id, data.email);
-    req.json({
+    res.json({
       logged: true,
       body: pickUserProps(data),
       token,

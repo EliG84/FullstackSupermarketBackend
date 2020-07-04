@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const { Product, ProductSchema } = require('./Product');
+const ProfileSchema = require('../Models/profile');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -8,15 +9,16 @@ const UserSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   answer: { type: String, required: true },
+  profile: { type: ProfileSchema, default: {} },
   cart: [ProductSchema],
-  profile: { type: Object, default: {} },
+  joined: { type: Date, default: Date.now() },
 });
 
 UserSchema.pre('save', function (next) {
   bcrypt.hash(this.password, 10, (err, secret) => {
     this.password = secret;
-    bcrypt.hash(this.answare, 10, (err, secret) => {
-      this.answare = secret;
+    bcrypt.hash(this.answer, 10, (err, secret) => {
+      this.answer = secret;
       next();
     });
   });

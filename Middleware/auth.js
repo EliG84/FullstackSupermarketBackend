@@ -14,14 +14,14 @@ const schema = Joi.object({
 });
 
 const authEmail = (req, res, next) => {
-  User.findOne({ email: req.data.email }).then((data) => {
+  User.findOne({ email: req.body.email }).then((data) => {
     if (data) return res.json({ logged: false, body: 'User already exists' });
     next();
   });
 };
 
 const authSignUp = (req, res, next) => {
-  const { error, value } = schema.validate(req.body).then(value);
+  const { error, value } = schema.validate(req.body);
   if (error)
     return res.json({ logged: false, body: error.ValidationError.message });
   next();
@@ -30,10 +30,11 @@ const authSignUp = (req, res, next) => {
 const authToken = (req, res, next) => {
   const token = req.header('x-auth-token');
   if (!token) return res.json({ logged: false, body: 'Token not present' });
-  const decoded = jwt.verify(token, config.get('key'));
-  if (!decoded) return res.json({ logged: false, body: 'Invalid Token' });
-  req.body.userId = decoded.id;
-  next();
+  jwt.verify(token, config.get('key'), (err, decoded) => {
+    if (err) return res.json({ logged: false, body: 'Invalid Token' });
+    req.body.userId = decoded.id;
+    next();
+  });
 };
 
 const authLogin = (req, res, next) => {
@@ -42,7 +43,7 @@ const authLogin = (req, res, next) => {
       return res.json({ logged: false, body: 'Invalid login details' });
     bcrypt.compare(req.body.password, data.password, (err, same) => {
       if (!same)
-        res.json({
+        return res.json({
           logged: false,
           body: 'Check your login details and try again',
         });
