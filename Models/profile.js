@@ -7,6 +7,7 @@ const ProfileSchema = new Schema({
   street: { type: String, default: '' },
   country: { type: String, default: '' },
   dob: { type: Date, default: '' },
+  image: { type: String, default: 'https://picsum.photos/200' },
 });
 
 module.exports = ProfileSchema;
