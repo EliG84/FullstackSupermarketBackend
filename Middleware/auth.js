@@ -22,8 +22,7 @@ const authEmail = (req, res, next) => {
 
 const authSignUp = (req, res, next) => {
   const { error, value } = schema.validate(req.body);
-  if (error)
-    return res.json({ logged: false, body: error.ValidationError.message });
+  if (error) return res.json({ logged: false, body: error });
   next();
 };
 

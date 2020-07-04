@@ -36,4 +36,18 @@ router.post('/signup', authEmail, authSignUp, (req, res) => {
   });
 });
 
+router.put('/cartUpdate/:id', (req, res) => {
+  const cart = req.body;
+  console.log(cart);
+  console.log(req.params.id);
+  User.updateOne({ _id: req.params.id }, { cart: cart })
+    .then((data) => {
+      res.status(200).json({ body: 'Cart Updated' });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json(err);
+    });
+});
+
 module.exports = router;
