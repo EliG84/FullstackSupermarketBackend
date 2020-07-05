@@ -6,7 +6,6 @@ const config = require('config');
 const User = require('../Models/User');
 
 const schema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(30).required(),
   email: Joi.string().max(30).email().required(),
   password: Joi.string().min(6).pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
   repeat_password: Joi.ref('password'),
@@ -22,7 +21,7 @@ const authEmail = (req, res, next) => {
 
 const authSignUp = (req, res, next) => {
   const { error, value } = schema.validate(req.body);
-  if (error) return res.json({ logged: false, body: error });
+  if (error) return res.json({ logged: false, body: error.details[0].message });
   next();
 };
 
