@@ -1,5 +1,6 @@
 const express = require('express');
 const _ = require('lodash');
+const path = require('path');
 const User = require('../Models/User');
 const {
   authEmail,
@@ -10,6 +11,14 @@ const {
   pickUserProps,
 } = require('../Middleware/auth');
 const router = express.Router();
+
+router.get('/single/:id', (req, res) => {
+  console.log(req.params.id);
+  User.findById(req.params.id).then((data) => {
+    console.log(data.profile);
+    res.status(200).json(data.profile);
+  });
+});
 
 router.get('/authToken', authToken, (req, res) => {
   User.findById(req.body.userId).then((data) => {
@@ -50,63 +59,47 @@ router.put('/cartUpdate/:id', (req, res) => {
 });
 
 router.put('/userProfile/:id', (req, res) => {
-  const profile = {
+  const newProfile = {
     FirstName: req.body.FirstName,
     LastName: req.body.LastName,
     street: req.body.street,
+    country: req.body.country,
     dob: req.body.dob,
   };
-  User.updateOne({ _id: req.params.id }, { profile: { ...profile } })
+  console.log(newProfile);
+  User.updateOne({ _id: req.params.id }, { profile: { ...newProfile } })
     .then((data) => {
-      res.status(200).json(data);
+      res.status(200).json({ uploaded: true, body: data });
     })
     .catch((err) => {
-      res
-        .status(400)
-        .json({ ok: false, body: 'Server Issue - Try again Later' });
-    });
-  const profile = {
-    FirstName: req.body.FirstName,
-    LastName: req.body.LastName,
-    street: req.body.street,
-    dob: req.body.dob,
-    image: `/img/${myFile.name}`,
-  };
-  User.updateOne({ _id: req.params.id }, { profile: { ...profile } })
-    .then((data) => {
-      res.status(200).json({ updated: true });
-    })
-    .catch((err) => {
+      console.log(err);
       res
         .status(400)
         .json({ ok: false, body: 'Server Issue - Try again Later' });
     });
 });
 
-router.put('/userAvatar/:id', (req, res) => {
-  let myFile = req.files.userAvatar;
-  myFile.name = req.params.id.concat('.').concat(myFile.split('.').pop());
-  myFile.mv(path.resolve(__dirname, 'public/img', image.name), () => {
-    const profile = {
-      FirstName: req.body.FirstName,
-      LastName: req.body.LastName,
-      street: req.body.street,
-      dob: req.body.dob,
-      image: `/img/${myFile.name}`,
-    };
-    User.updateOne(
-      { _id: req.params.id },
-      { profile: { image: `/img/${myFile.name}` } }
-    )
-      .then((data) => {
-        res.status(200).json({ uploaded: true });
-      })
-      .catch((err) => {
-        res
-          .status(400)
-          .json({ ok: false, body: 'Server Issue - Try again Later' });
-      });
-  });
+router.post('/userAvatar/:id', (req, res) => {
+  if (req.files) {
+    let myFile = req.files.userAvatar;
+    myFile.name = req.params.id
+      .concat('.')
+      .concat(myFile.name.split('.').pop());
+    myFile.mv('public/img/' + myFile.name, () => {
+      User.updateOne(
+        { _id: req.params.id },
+        { profile: { image: `http://localhost:3001/img/${myFile.name}` } }
+      )
+        .then((data) => {
+          res.status(200).json({ uploaded: true, body: data });
+        })
+        .catch((err) => {
+          res
+            .status(400)
+            .json({ ok: false, body: 'Server Issue - Try again Later' });
+        });
+    });
+  }
 });
 
 module.exports = router;
