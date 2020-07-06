@@ -87,11 +87,11 @@ router.post('/userAvatar/:id', (req, res) => {
         return res
           .status(400)
           .json({ uploaded: false, body: 'Server Issue - Try again Later' });
-      user.profile.image = `http://localhost:3001/img/${myFile.name}`;
+      user.profile.image = `https://aqueous-brook-65256.herokuapp.com/img/${myFile.name}`;
       await user.save();
       res.status(200).json({
         uploaded: true,
-        body: 'http://localhost:3001/img/' + myFile.name,
+        body: 'https://aqueous-brook-65256.herokuapp.com/img/' + myFile.name,
       });
     });
   } else {
