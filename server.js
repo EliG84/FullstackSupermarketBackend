@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
 const path = require('path');
+const https = require('https');
 const fileUpload = require('express-fileupload');
 const mongoConnect = require('./DB/mongoConnect');
 
@@ -21,6 +23,18 @@ const userRouter = require('./Routes/userRouter');
 app.use('/api', productRouter);
 app.use('/user', userRouter);
 
-app.listen(port, () => {
-  console.log(`listening on port ${port}`);
-});
+https
+  .createServer(
+    {
+      key: fs.readFileSync('server.key'),
+      cert: fs.readFileSync('server.cert'),
+    },
+    app
+  )
+  .listen(port, () => {
+    console.log(`listening on port ${port}`);
+  });
+
+// app.listen(port, () => {
+//   console.log(`listening on port ${port}`);
+// });
