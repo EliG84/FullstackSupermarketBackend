@@ -10,7 +10,8 @@ const ProfileSchema = new Schema(
     dob: { type: String, default: '' },
     image: {
       type: String,
-      default: 'https://speedtechstore1.herokuapp.com/img/default-avatar.jpg',
+      default:
+        'https://aqueous-brook-65256.herokuapp.com/img/default-avatar.jpg',
     },
   },
   { _id: false }
