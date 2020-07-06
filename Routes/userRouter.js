@@ -13,9 +13,7 @@ const {
 const router = express.Router();
 
 router.get('/single/:id', (req, res) => {
-  console.log(req.params.id);
   User.findById(req.params.id).then((data) => {
-    console.log(data.profile);
     res.status(200).json(data.profile);
   });
 });
@@ -27,7 +25,6 @@ router.get('/authToken', authToken, (req, res) => {
 });
 
 router.post('/login', authLogin, (req, res) => {
-  console.log(req.body.user);
   res.json({
     logged: true,
     body: pickUserProps(req.body.user),
@@ -36,7 +33,6 @@ router.post('/login', authLogin, (req, res) => {
 });
 
 router.post('/signup', authEmail, authSignUp, (req, res) => {
-  console.log(req.body);
   User.create(req.body).then((data) => {
     const token = generateToken(data._id, data.email);
     res.json({

@@ -14,13 +14,18 @@ const UserSchema = new Schema({
 });
 
 UserSchema.pre('save', function (next) {
-  bcrypt.hash(this.password, 10, (err, secret) => {
-    this.password = secret;
-    bcrypt.hash(this.answer, 10, (err, secret) => {
-      this.answer = secret;
-      next();
+  console.log(this.password.length);
+  if (this.password.length < 40) {
+    bcrypt.hash(this.password, 10, (err, secret) => {
+      this.password = secret;
+      bcrypt.hash(this.answer, 10, (err, secret) => {
+        this.answer = secret;
+        next();
+      });
     });
-  });
+  } else {
+    next();
+  }
 });
 
 const User = mongoose.model('user', UserSchema);

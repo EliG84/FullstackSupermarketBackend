@@ -4,6 +4,7 @@ const _ = require('lodash');
 const Joi = require('@hapi/joi');
 const config = require('config');
 const User = require('../Models/User');
+const { result } = require('lodash');
 
 const schema = Joi.object({
   email: Joi.string().max(30).email().required(),
@@ -36,16 +37,17 @@ const authToken = (req, res, next) => {
 };
 
 const authLogin = (req, res, next) => {
-  console.log(req.body.email);
+  console.log(req.body.password);
   User.findOne({ email: req.body.email }).then((data) => {
     if (!data)
       return res.json({ logged: false, body: 'Invalid login details' });
-    bcrypt.compare(req.body.password, data.password, (err, same) => {
-      if (!same)
+    bcrypt.compare(req.body.password, data.password).then((result) => {
+      if (!result) {
         return res.json({
           logged: false,
           body: 'Check your login details and try again',
         });
+      }
       const token = jwt.sign(
         { id: data._id, email: data.email },
         config.get('key')
@@ -54,6 +56,22 @@ const authLogin = (req, res, next) => {
       req.body.token = token;
       next();
     });
+    // bcrypt.compare(req.body.password, data.password, (err, same) => {
+    //   console.log(data.password);
+    //   console.log(same);
+    //   if (!same)
+    //     return res.json({
+    //       logged: false,
+    //       body: 'Check your login details and try again',
+    //     });
+    //   const token = jwt.sign(
+    //     { id: data._id, email: data.email },
+    //     config.get('key')
+    //   );
+    //   req.body.user = data;
+    //   req.body.token = token;
+    //   next();
+    // });
   });
 };
 
