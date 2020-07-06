@@ -1,8 +1,6 @@
 const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
+// const cors = require('cors');
 const path = require('path');
-const https = require('https');
 const fileUpload = require('express-fileupload');
 const mongoConnect = require('./DB/mongoConnect');
 
@@ -11,7 +9,20 @@ const port = process.env.PORT || 3001;
 
 mongoConnect();
 
-app.use(cors());
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin,X-Requested-With,Content-Type,Accept'
+  );
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET,POST,PATCH,PUT,DELETE,OPTIONS'
+  );
+  next();
+});
+
+// app.use(cors());
 app.use(fileUpload());
 app.use(express.static(path.join(__dirname, './public')));
 app.use(express.json());
@@ -22,18 +33,6 @@ const userRouter = require('./Routes/userRouter');
 
 app.use('/api', productRouter);
 app.use('/user', userRouter);
-
-// https
-//   .createServer(
-//     {
-//       key: fs.readFileSync('server.key'),
-//       cert: fs.readFileSync('server.cert'),
-//     },
-//     app
-//   )
-//   .listen(port, () => {
-//     console.log(`listening on port ${port}`);
-//   });
 
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
