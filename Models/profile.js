@@ -10,7 +10,7 @@ const ProfileSchema = new Schema(
     dob: { type: String, default: '' },
     image: {
       type: String,
-      default: 'http://localhost:3001/img/default-avatar.jpg',
+      default: 'https://speedtechstore1.herokuapp.com/img/default-avatar.jpg',
     },
   },
   { _id: false }

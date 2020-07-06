@@ -36,6 +36,7 @@ const authToken = (req, res, next) => {
 };
 
 const authLogin = (req, res, next) => {
+  console.log(req.body.email);
   User.findOne({ email: req.body.email }).then((data) => {
     if (!data)
       return res.json({ logged: false, body: 'Invalid login details' });
