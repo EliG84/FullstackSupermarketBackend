@@ -58,25 +58,17 @@ router.put('/cartUpdate/:id', (req, res) => {
     });
 });
 
-router.put('/userProfile/:id', (req, res) => {
-  const newProfile = {
-    FirstName: req.body.FirstName,
-    LastName: req.body.LastName,
-    street: req.body.street,
-    country: req.body.country,
-    dob: req.body.dob,
-  };
-  console.log(newProfile);
-  User.updateOne({ _id: req.params.id }, { profile: { ...newProfile } })
-    .then((data) => {
-      res.status(200).json({ uploaded: true, body: data });
-    })
-    .catch((err) => {
-      console.log(err);
-      res
-        .status(400)
-        .json({ ok: false, body: 'Server Issue - Try again Later' });
-    });
+router.put('/userProfile/:id', async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user)
+    return res.status(400).json({ updated: false, body: 'User Not Found' });
+  user.profile.FirstName = req.body.FirstName;
+  user.profile.LastName = req.body.LastName;
+  user.profile.street = req.body.street;
+  user.profile.country = req.body.country;
+  user.profile.dob = req.body.dob;
+  await user.save();
+  res.status(200).json({ updated: true, body: user.profile });
 });
 
 router.post('/userAvatar/:id', (req, res) => {
@@ -84,21 +76,24 @@ router.post('/userAvatar/:id', (req, res) => {
     let myFile = req.files.userAvatar;
     myFile.name = req.params.id
       .concat('.')
+      .concat(Math.random())
+      .concat('.')
       .concat(myFile.name.split('.').pop());
-    myFile.mv('public/img/' + myFile.name, () => {
-      User.updateOne(
-        { _id: req.params.id },
-        { profile: { image: `http://localhost:3001/img/${myFile.name}` } }
-      )
-        .then((data) => {
-          res.status(200).json({ uploaded: true, body: data });
-        })
-        .catch((err) => {
-          res
-            .status(400)
-            .json({ ok: false, body: 'Server Issue - Try again Later' });
-        });
+    myFile.mv('public/img/' + myFile.name, async () => {
+      const user = await User.findById(req.params.id);
+      if (!user)
+        return res
+          .status(400)
+          .json({ uploaded: false, body: 'Server Issue - Try again Later' });
+      user.profile.image = `http://localhost:3001/img/${myFile.name}`;
+      await user.save();
+      res.status(200).json({
+        uploaded: true,
+        body: 'http://localhost:3001/img/' + myFile.name,
+      });
     });
+  } else {
+    res.status(400).json({ upladed: false, body: 'Image not recieved' });
   }
 });
 

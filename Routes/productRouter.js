@@ -20,6 +20,17 @@ router.get('/:cat', (req, res) => {
   });
 });
 
+router.get('/search/:q', (req, res) => {
+  const mySearch = new RegExp(`${req.params.q}`);
+  Product.find({ $or: [{ name: mySearch }, { info: mySearch }] })
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+});
+
 router.post('/addProduct', (req, res) => {
   const newProduct = new Product({
     name: req.body.name,
