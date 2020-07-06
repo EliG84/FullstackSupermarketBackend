@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 module.exports = () => {
   mongoose.connect(
-    'mongodb://localhost:27017/reactstore1',
+    'mongodb+srv://speedtech:letsrock@speedtech.vyer8.gcp.mongodb.net/reactstore1',
     { useNewUrlParser: true, useUnifiedTopology: true },
     (err) => {
       if (err) return console.log(err);
