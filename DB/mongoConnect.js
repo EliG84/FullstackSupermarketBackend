@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
+const config = require('config');
 
 module.exports = () => {
   mongoose.connect(
-    'mongodb+srv://speedtech:letsrock@speedtech.vyer8.gcp.mongodb.net/reactstore1',
+    `mongodb+srv://${config.get('mUser')}:${config.get(
+      'mPass'
+    )}@speedtech.vyer8.gcp.mongodb.net/reactstore1`,
     { useNewUrlParser: true, useUnifiedTopology: true },
     (err) => {
       if (err) return console.log(err);
